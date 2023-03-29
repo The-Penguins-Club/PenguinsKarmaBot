@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "karmabot"
+version = "0.1.0"
+description = "A karma bot for Penguins Network."
+authors = ["rozari0 <rozario@tuta.io>"]
+license = "GPL3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Pyrogram = "^2.0.102"
+TgCrypto = "^1.2.5"
+python-dotenv = "^1.0.0"
+motor = {extras = ["srv"], version = "^3.1.1"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
