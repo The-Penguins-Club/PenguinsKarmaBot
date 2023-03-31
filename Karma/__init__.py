@@ -1,11 +1,12 @@
 from os import environ, path, sys
 
 from dotenv import load_dotenv
-from motor.motor_asyncio import AsyncIOMotorClient as MongoClient
+from peewee import SqliteDatabase
 from pyrogram import Client
 
 if path.exists("config.env"):
     load_dotenv("config.env")
+
 
 REQUIRED_KEYS = ["API_ID", "API_HASH", "BOT_TOKEN", "DB_URI"]
 for _key in REQUIRED_KEYS:
@@ -13,10 +14,9 @@ for _key in REQUIRED_KEYS:
         print(f"{_key} is missing.")
         sys.exit(1)
 
-# MongoDB client
+# Sql client
 print("[INFO]: INITIALIZING DATABASE")
-mongo_client = MongoClient(environ["DB_URI"])
-db = mongo_client.Karma
+db = SqliteDatabase("my_database.db")
 
 
 class Karma(Client):
