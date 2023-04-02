@@ -18,6 +18,10 @@ for _key in REQUIRED_KEYS:
 db = SqliteDatabase("PenguinsKarma.db")
 
 
+SUDOERS = []
+for sudo in environ.get('SUDOERS').split():
+    SUDOERS.append(int(sudo))
+
 class Karma(Client):
     def __init__(self):
         name = self.__class__.__name__.lower()
