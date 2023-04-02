@@ -1,10 +1,11 @@
 # Copied from old work.
 # https://github.com/rozari0/NeedMusicRobot/blob/master/mbot/plugins/greetings.py
+from os import execvp, sys
+
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from Karma import Karma, SUDOERS
-from os import execvp, sys
+from Karma import SUDOERS, Karma
 
 
 @Karma.on_message(filters.command("start"))

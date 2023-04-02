@@ -2,16 +2,13 @@ from re import findall
 
 from pyrogram import filters
 
-from Karma import Karma, SUDOERS
-from Karma.utils.dbhelpers import Karma as KarmaDB
+from Karma import SUDOERS, Karma
 from Karma.utils.dbhelpers import (
-    MonthYear,
     User,
-    get_month_year,
-    sum_of_karma,
-    get_user,
     get_current_MY,
     get_karma_db,
+    get_user,
+    sum_of_karma,
 )
 
 karma_re = f"^(?:\+\+|\+|\-\-|\-)?(\d+)"
