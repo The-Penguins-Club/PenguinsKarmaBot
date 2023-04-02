@@ -1,7 +1,6 @@
 from datetime import datetime
 
-from peewee import (BooleanField, CharField, ForeignKeyField, IntegerField,
-                    Model)
+from peewee import BooleanField, CharField, ForeignKeyField, IntegerField, Model
 
 from Karma import db
 
@@ -39,3 +38,26 @@ def sum_of_karma(User):
     for karma in User.karmas:
         sum = sum + karma.karma
     return sum
+
+
+def get_user(userid):
+    try:
+        return User.get(User.user_id == userid)
+    except Exception:
+        return User.create(user_id=userid)
+
+
+def get_current_MY():
+    try:
+        return MonthYear.get(MonthYear.id == get_month_year())
+    except Exception:
+        MonthYear.create()
+        return MonthYear.get(MonthYear.id == get_month_year())
+
+
+def get_karma_db(user, month):
+    try:
+        return Karma.get(Karma.user == user, Karma.month_id == month)
+    except Exception:
+        Karma.create(user=user, month_id=month, karma=0)
+        return Karma.get(Karma.user == user, Karma.month_id == month)

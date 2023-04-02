@@ -3,7 +3,8 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from Karma import Karma
+from Karma import Karma, SUDOERS
+from os import execvp, sys
 
 
 @Karma.on_message(filters.command("start"))
@@ -12,8 +13,9 @@ async def start(_, message):
 
 
 helps = {
-    "Stats": "Hiiii",
-    "Rules": "Byee",
+    "Reward": "Only Sudoers can Reward Member.\nUse **/reward @username 50**(Any Int Value).",
+    "Restart": "Only Sudoers can Restart bot.\nUse **/restart** in private.",
+    "Rules": "Send ++1 or --1 to give or take karma. (Do not abuse, You'll be blacklisted)",
 }
 
 
@@ -44,3 +46,9 @@ async def help_home(_, query):
         f"Hello **{query.from_user.mention}**, I'm **Penguins Karma Bot**.",
         reply_markup=InlineKeyboardMarkup(button),
     )
+
+
+@Karma.on_message(filters.command("restart") & filters.chat(SUDOERS) & filters.private)
+async def restart(_, message):
+    await message.delete()
+    execvp(sys.executable, [sys.executable, "-m", "Karma"])

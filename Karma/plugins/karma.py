@@ -2,9 +2,17 @@ from re import findall
 
 from pyrogram import filters
 
-from Karma import Karma
+from Karma import Karma, SUDOERS
 from Karma.utils.dbhelpers import Karma as KarmaDB
-from Karma.utils.dbhelpers import MonthYear, User, get_month_year, sum_of_karma
+from Karma.utils.dbhelpers import (
+    MonthYear,
+    User,
+    get_month_year,
+    sum_of_karma,
+    get_user,
+    get_current_MY,
+    get_karma_db,
+)
 
 karma_re = f"^(?:\+\+|\+|\-\-|\-)?(\d+)"
 
@@ -14,27 +22,16 @@ async def Whole_Dmn_Thing(message, is_positive=True):
 
     if not from_user or not to_user:
         return
-    try:
-        user = User.get(User.user_id == to_user.id)
-    except Exception:
-        user = User.create(user_id=to_user.id)
-    try:
-        month = MonthYear.get(MonthYear.id == get_month_year())
-    except Exception:
-        MonthYear.create()
-        month = MonthYear.get(MonthYear.id == get_month_year())
-    try:
-        karma = KarmaDB.get(KarmaDB.user == user, KarmaDB.month_id == month)
-    except Exception:
-        KarmaDB.create(user=user, month_id=month, karma=0)
-        karma = KarmaDB.get(KarmaDB.user == user, KarmaDB.month_id == month)
+    user = get_user(to_user.id)
+    month = get_current_MY()
+    karma = get_karma_db(user, month)
     karmanum = int(findall(karma_re, message.text)[0])
     if karmanum > 20 or karmanum < 1:
         return await message.reply("Minimum Karma is 1, Max is 20. :3")
     if from_user.id == to_user.id:
         if not is_positive:
             return
-        karma.karma = karma.karma - karmanum
+        karma.karma = karma.karma - 1
         karma.save()
         return await message.reply("টুরা কোড! টুরা কোড!")
     if is_positive:
@@ -109,20 +106,9 @@ async def karma(app, message):
     except Exception:
         return await message.reply("User not Found.")
 
-    try:
-        user = User.get(User.user_id == userid)
-    except Exception:
-        user = User.create(user_id=userid)
-    try:
-        month = MonthYear.get(MonthYear.id == get_month_year())
-    except Exception:
-        MonthYear.create()
-        month = MonthYear.get(MonthYear.id == get_month_year())
-    try:
-        karma = KarmaDB.get(KarmaDB.user == user, KarmaDB.month_id == month)
-    except Exception:
-        KarmaDB.create(user=user, month_id=month, karma=0)
-        karma = KarmaDB.get(KarmaDB.user == user, KarmaDB.month_id == month)
+    user = get_user(userid)
+    month = get_current_MY()
+    karma = get_karma_db(user, month)
     karmanum = message.command[2]
     try:
         karmanum = int(float(karmanum))
@@ -140,4 +126,23 @@ async def karma(app, message):
         )
     await message.reply(
         f"Karma decremented by: {karmanum}.\nCurrent Karma Count is: {sum_of_karma(user)}"
+    )
+
+
+@Karma.on_message(
+    filters.command("reward") & filters.user(SUDOERS) & filters.reply & filters.group
+)
+async def Reward(_, message):
+    to_user = message.reply_to_message.from_user
+    if not len(message.command) > 1:
+        return await message.reply("I need Two Arguments! See help section.")
+    if not to_user:
+        return await message.reply("I can't reward an anon user.")
+
+    user = get_user(to_user.id)
+    month = get_current_MY()
+    karma = get_karma_db(user, month)
+    karma.karma = karma.karma + int(float(message.command[1]))
+    return await message.reply(
+        f"{message.from_user.mention} rewarded {to_user.mention} with {message.command[1]} Karma."
     )
