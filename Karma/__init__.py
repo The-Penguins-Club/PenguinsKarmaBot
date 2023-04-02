@@ -19,8 +19,9 @@ db = SqliteDatabase("PenguinsKarma.db")
 
 
 SUDOERS = []
-for sudo in environ.get('SUDOERS').split():
+for sudo in environ.get("SUDOERS").split():
     SUDOERS.append(int(sudo))
+
 
 class Karma(Client):
     def __init__(self):
