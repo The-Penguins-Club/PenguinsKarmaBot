@@ -24,10 +24,18 @@ class User(BaseModel):
 
 
 class MonthYear(BaseModel):
-    id = CharField(primary_key = True,unique=True, default=get_month_year())
+    id = CharField(primary_key=True, unique=True, default=get_month_year())
 
 
 class Karma(BaseModel):
+    id = IntegerField(unique=True, primary_key=True)
     user = ForeignKeyField(User, backref="karmas")
     month_id = ForeignKeyField(MonthYear, backref="karmas")
     karma = IntegerField(default=1)
+
+
+def sum_of_karma(User):
+    sum = 0
+    for karma in User.karmas:
+        sum = sum + karma.karma
+    return sum

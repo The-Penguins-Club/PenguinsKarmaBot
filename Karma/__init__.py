@@ -1,22 +1,21 @@
 from os import environ, path, sys
 
 from dotenv import load_dotenv
-from peewee import SqliteDatabase
+from peewee import PostgresqlDatabase, SqliteDatabase
 from pyrogram import Client
 
 if path.exists("config.env"):
     load_dotenv("config.env")
 
 
-REQUIRED_KEYS = ["API_ID", "API_HASH", "BOT_TOKEN", "DB_URI"]
+REQUIRED_KEYS = ["API_ID", "API_HASH", "BOT_TOKEN"]
 for _key in REQUIRED_KEYS:
     if not environ.get(_key):
         print(f"{_key} is missing.")
         sys.exit(1)
 
 # Sql client
-print("[INFO]: INITIALIZING DATABASE")
-db = SqliteDatabase("my_database.db")
+db = SqliteDatabase("PenguinsKarma.db")
 
 
 class Karma(Client):
