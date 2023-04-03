@@ -7,6 +7,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from Karma import SUDOERS, Karma
 from Karma.utils.filters import is_sudo
+from pyrogram import enums
 
 
 @Karma.on_message(filters.command("start"))
@@ -26,6 +27,8 @@ helps = {
 
 @Karma.on_message(filters.command("help"))
 async def help(_, message):
+    if message.chat.type != enums.ChatType.PRIVATE:
+        return await message.reply("Send help command in PM. -_-")
     button = [[InlineKeyboardButton(text=i, callback_data=f"help_{i}")] for i in helps]
 
     await message.reply_text(
