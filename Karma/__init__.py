@@ -20,7 +20,10 @@ db = SqliteDatabase("PenguinsKarma.db")
 
 SUDOERS = [int(sudo) for sudo in environ.get("SUDOERS").split()]
 NETWORK = [int(group_id) for group_id in environ.get("NETWORK").split()]
-
+try:
+    PREFIXS = [prefix for prefix in environ.get("PREFIX").split()]
+except AttributeError:
+    PREFIXS = ["!","/","."]
 
 class Karma(Client):
     def __init__(self):

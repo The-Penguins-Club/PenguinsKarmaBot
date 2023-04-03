@@ -2,7 +2,7 @@ from re import findall
 
 from pyrogram import filters
 
-from Karma import SUDOERS, Karma, NETWORK
+from Karma import SUDOERS, Karma, NETWORK, PREFIXS
 from Karma.utils.dbhelpers import (
     User,
     get_current_MY,
@@ -67,7 +67,7 @@ async def KarmaFirm(_, message):
 
 
 @Karma.on_message(
-    filters.command(["karmacount"]) & is_whitelisted & filters.chat(NETWORK)
+    filters.command(["karmacount"],prefixes=PREFIXS) & is_whitelisted & filters.chat(NETWORK)
 )
 async def karmaCount(_, message):
     if message.reply_to_message:
@@ -81,7 +81,7 @@ async def karmaCount(_, message):
     await message.reply(f"Karma Count of {user_t.mention} is {sum_of_karma(user)}")
 
 
-@Karma.on_message(filters.command(["stats"]) & filters.chat(NETWORK))
+@Karma.on_message(filters.command(["stats"],prefixes=PREFIXS) & filters.chat(NETWORK))
 async def stats(app, message):
     stats = {}
     for user in User.select():
@@ -114,7 +114,7 @@ def neutral(x: int):
         return 0
 
 
-@Karma.on_message(filters.command(["karma"]) & is_whitelisted & filters.chat(NETWORK))
+@Karma.on_message(filters.command(["karma"],prefixes=PREFIXS) & is_whitelisted & filters.chat(NETWORK))
 async def karma(app, message):
     if not len(message.command) > 2:
         return
@@ -148,7 +148,7 @@ async def karma(app, message):
 
 
 @Karma.on_message(
-    filters.command("reward") & is_sudo & filters.reply & filters.chat(NETWORK)
+    filters.command("reward",prefixes=PREFIXS) & is_sudo & filters.reply & filters.chat(NETWORK)
 )
 async def Reward(_, message):
     to_user = message.reply_to_message.from_user
@@ -166,7 +166,7 @@ async def Reward(_, message):
 
 
 @Karma.on_message(
-    filters.command(["blacklist"], prefixes=["/", "!"])
+    filters.command(["blacklist"], prefixes=PREFIXS)
     & is_sudo
     & filters.reply
     & filters.chat(NETWORK)
@@ -185,7 +185,7 @@ async def blacklist(_, message):
 
 
 @Karma.on_message(
-    filters.command(["rmblacklist"], prefixes=["/", "!"])
+    filters.command(["rmblacklist"], prefixes=PREFIXS)
     & is_sudo
     & filters.reply
     & filters.chat(NETWORK)
@@ -204,7 +204,7 @@ async def rmblacklist(_, message):
 
 
 @Karma.on_message(
-    filters.command(["give", "gift"]) & is_whitelisted & filters.chat(NETWORK)
+    filters.command(["give", "gift"],prefixes=PREFIXS) & is_whitelisted & filters.chat(NETWORK)
 )
 async def donate(_, message):
     donor = message.from_user
