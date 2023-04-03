@@ -1,0 +1,15 @@
+version: "2.4"
+
+services:
+  penguinskarmabot:
+    build:
+      context: .
+    restart: unless-stopped
+    env_file:
+      - config.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./PenguinsKarma.db:/app/PenguinsKarma.db
+    mem_limit: "256m"
+    labels:
+      - traefik.enable=false
