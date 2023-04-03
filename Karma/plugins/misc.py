@@ -18,6 +18,9 @@ helps = {
     "Reward": "Only Sudoers can Reward Member.\nUse **/reward @username 50**(Any Int Value).",
     "Restart": "Only Sudoers can Restart bot.\nUse **/restart** in private.",
     "Rules": "Send ++1 or --1 to give or take karma. (Do not abuse, You'll be blacklisted)",
+    "Donation": "Use **/give 25(int)** in reply for donate karma.",
+    "Admin": "Use **/blacklist** if you want to blacklist someone and **/rmblacklist** if you want to remove someone from blacklist.",
+    "Stats": "Use **/stats** for Overall Stats.\nUse **/karmacount** if you want to get karma of specific someone.",
 }
 
 

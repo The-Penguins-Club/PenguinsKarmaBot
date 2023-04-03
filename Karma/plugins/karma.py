@@ -15,14 +15,18 @@ from Karma.utils.filters import is_whitelisted, is_sudo
 karma_re = f"^(?:\+\+|\+|\-\-|\-)?(\d+)"
 
 
-async def Whole_Dmn_Thing(message, is_positive=True):
+async def Whole_Dmn_Thing(message, is_positive=True, is_admin=False):
     from_user, to_user = message.from_user, message.reply_to_message.from_user
 
     user = get_user(to_user.id)
     month = get_current_MY()
     karma = get_karma_db(user, month)
     karmanum = int(findall(karma_re, message.text)[0])
-    if karmanum > 20 or karmanum < 1:
+    if not is_positive and karmanum > 1 and not is_admin:
+        return await message.reply(
+            "Non admin user can't reduct karma more that 1. Sorry."
+        )
+    if (karmanum > 20 or karmanum < 1) and not is_admin:
         return await message.reply("Minimum Karma is 1, Max is 20. :3")
     if from_user.id == to_user.id:
         if not is_positive:
@@ -53,8 +57,12 @@ async def Whole_Dmn_Thing(message, is_positive=True):
 )
 async def KarmaFirm(_, message):
     if message.text.startswith("+"):
+        if get_user(message.from_user.id).is_sudo or message.from_user.id in SUDOERS:
+            return await Whole_Dmn_Thing(message,True,True)
         return await Whole_Dmn_Thing(message)
     elif message.text.startswith("-"):
+        if get_user(message.from_user.id).is_sudo or message.from_user.id in SUDOERS:
+            return await Whole_Dmn_Thing(message, False, True)
         return await Whole_Dmn_Thing(message, False)
 
 
