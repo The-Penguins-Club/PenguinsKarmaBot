@@ -27,7 +27,7 @@ class User(BaseModel):
     id = IntegerField(unique=True, primary_key=True)
     user_id = IntegerField(unique=True)
     is_sudo = BooleanField(default=False)
-    is_blacklisted = BooleanField(default=False)
+    is_blacklisted = BooleanField(default=0)
     reason_blacklist = TextField(null=True, default="")
 
 

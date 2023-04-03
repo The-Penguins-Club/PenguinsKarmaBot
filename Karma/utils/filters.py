@@ -19,13 +19,18 @@ async def is_sudo(_, __, message: Message):
 is_sudo = filters.create(is_sudo)
 
 
-async def is_blacklisted(_, __, message: Message):
-    if not message.from_user or not message.reply_to_message.from_user:
+async def is_whitelisted(_, __, message: Message):
+    if not message.from_user:
         await message.reply("You Or the user you are replying is Anon.")
-        return True
-    if get_user(message.from_user.id).is_blacklisted:
-        return True
-    return False
+        return False
+    if message.reply_to_message:
+        if not message.reply_to_message.from_user:
+            False
+
+    user = get_user(message.from_user.id)
+    if user.is_blacklisted:
+        return False
+    return True
 
 
-is_blacklisted = filters.create(is_blacklisted)
+is_whitelisted = filters.create(is_whitelisted)

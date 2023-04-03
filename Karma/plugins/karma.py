@@ -10,7 +10,7 @@ from Karma.utils.dbhelpers import (
     get_user,
     sum_of_karma,
 )
-from Karma.utils.filters import is_blacklisted, is_sudo
+from Karma.utils.filters import is_whitelisted, is_sudo
 
 karma_re = f"^(?:\+\+|\+|\-\-|\-)?(\d+)"
 
@@ -48,7 +48,7 @@ async def Whole_Dmn_Thing(message, is_positive=True):
     filters.regex(karma_re)
     & filters.reply
     & filters.group
-    & ~is_blacklisted
+    & is_whitelisted
     & filters.chat(NETWORK)
 )
 async def KarmaFirm(_, message):
@@ -59,7 +59,7 @@ async def KarmaFirm(_, message):
 
 
 @Karma.on_message(
-    filters.command(["karmacount"]) & ~is_blacklisted & filters.command(NETWORK)
+    filters.command(["karmacount"]) & is_whitelisted & filters.chat(NETWORK)
 )
 async def karmaCount(_, message):
     if message.reply_to_message:
@@ -73,24 +73,27 @@ async def karmaCount(_, message):
     await message.reply(f"Karma Count of {user_t.mention} is {sum_of_karma(user)}")
 
 
-@Karma.on_message(filters.command(["stats"]) & filters.command(NETWORK))
+@Karma.on_message(filters.command(["stats"]) & filters.chat(NETWORK))
 async def stats(app, message):
     stats = {}
-    _limit, _current = 15, 0
     for user in User.select():
         stats[user.user_id] = sum_of_karma(user)
-        if _limit == _current:
-            break
-        _current += 1
-
     # https://www.freecodecamp.org/news/sort-dictionary-by-value-in-python/
-    print(stats)
-    stats = dict(sorted(stats.items(), key=lambda x: x[1]), reverse=True)
-    print(stats)
-    message_text = ""
+    stats = dict(sorted(stats.items(), key=lambda x: x[1], reverse=True))
+    message_text = "Stats:\n\n"
+    _limit, _current = 15, 0
     for user in stats:
-        user_t = await app.get_users(int(user))
-        message_text += f"{user_t.mention} = {stats.get(user)}\n"
+        try:
+            user_t = await app.get_users(int(user))
+            message_text += f"{user_t.mention} = {stats.get(user)}\n"
+            if _limit == _current:
+                break
+            _current += 1
+
+        except Exception:
+            user = get_user(user)
+            user.delete_instance()
+            print(f"Removed {user}.")
     await message.reply(message_text)
 
 
@@ -103,7 +106,7 @@ def neutral(x: int):
         return 0
 
 
-@Karma.on_message(filters.command(["karma"]) & ~is_blacklisted & filters.chat(NETWORK))
+@Karma.on_message(filters.command(["karma"]) & is_whitelisted & filters.chat(NETWORK))
 async def karma(app, message):
     if not len(message.command) > 2:
         return
@@ -148,18 +151,22 @@ async def Reward(_, message):
 
     karma = get_karma_db(get_user(to_user.id), get_current_MY())
     karma.karma = karma.karma + int(float(message.command[1]))
+    karma.save()
     return await message.reply(
         f"{message.from_user.mention} rewarded {to_user.mention} with {message.command[1]} Karma."
     )
 
 
 @Karma.on_message(
-    filters.command("blacklist") & is_sudo & filters.reply & filters.chat(NETWORK)
+    filters.command(["blacklist"], prefixes=["/", "!"])
+    & is_sudo
+    & filters.reply
+    & filters.chat(NETWORK)
 )
 async def blacklist(_, message):
     if not message.reply_to_message.from_user:
         return await message.reply("Can't Blacklist an Anon User.")
-    user = get_user(message.reply_to_message.id)
+    user = get_user(message.reply_to_message.from_user.id)
     user.is_blacklisted = True
     reason = " ".join(message.command[1:])
     user.reason_blacklist = reason
@@ -169,20 +176,44 @@ async def blacklist(_, message):
     )
 
 
-@Karma.on_message(filters.command("donate") & ~is_blacklisted & filters.chat(NETWORK))
+@Karma.on_message(
+    filters.command(["rmblacklist"], prefixes=["/", "!"])
+    & is_sudo
+    & filters.reply
+    & filters.chat(NETWORK)
+)
+async def rmblacklist(_, message):
+    if not message.reply_to_message.from_user:
+        return await message.reply("Can't UnBlacklist an Anon User.")
+    user = get_user(message.reply_to_message.from_user.id)
+    user.is_blacklisted = False
+    reason = " ".join(message.command[1:])
+    user.reason_blacklist = ""
+    user.save()
+    return await message.reply(
+        f"{message.reply_to_message.from_user.mention} has been removed from blacklist.\nReason is: {reason}"
+    )
+
+
+@Karma.on_message(
+    filters.command(["give", "gift"]) & is_whitelisted & filters.chat(NETWORK)
+)
 async def donate(_, message):
     donor = message.from_user
-    donordb = get_user(donor.id)
+    donordb = get_karma_db(get_user(donor.id), get_current_MY())
     recipient = message.reply_to_message.from_user
-    recipientdb = get_user(recipient.id)
-    property_of_donor = sum_of_karma(donordb)
-    donation = neutral(message.command[1])
+    recipientdb = get_karma_db(get_user(recipient.id), get_current_MY())
+    property_of_donor = sum_of_karma(get_user(donor.id))
+    donation = neutral(int(float(message.command[1])))
     if (property_of_donor - donation) < 0:
         return await message.reply("Hehe, Nice Try.")
-    donordb.karma, recipientdb.karma = (
-        donordb.karma - donation,
-        recipientdb.karma + donation,
-    )
+    print(donordb.karma, recipientdb.karma)
+    donordb.karma = donordb.karma - donation
+    recipient.karma = recipientdb.karma + donation
+    print(donor.id)
+    print(donordb.karma, recipientdb.karma)
+    donordb.save()
+    recipientdb.save()
     return await message.reply(
-        f"{donor.mention} donated {donation} ~~dollar~~karma to {recipient.mention}"
+        f"{donor.mention} donated {donation} ~~dollar~~karma to {recipient.mention}."
     )
