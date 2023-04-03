@@ -58,7 +58,7 @@ async def Whole_Dmn_Thing(message, is_positive=True, is_admin=False):
 async def KarmaFirm(_, message):
     if message.text.startswith("+"):
         if get_user(message.from_user.id).is_sudo or message.from_user.id in SUDOERS:
-            return await Whole_Dmn_Thing(message,True,True)
+            return await Whole_Dmn_Thing(message, True, True)
         return await Whole_Dmn_Thing(message)
     elif message.text.startswith("-"):
         if get_user(message.from_user.id).is_sudo or message.from_user.id in SUDOERS:
