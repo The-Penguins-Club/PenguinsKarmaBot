@@ -1,6 +1,13 @@
 from datetime import datetime
 
-from peewee import BooleanField, CharField, ForeignKeyField, IntegerField, Model
+from peewee import (
+    BooleanField,
+    CharField,
+    ForeignKeyField,
+    IntegerField,
+    Model,
+    TextField,
+)
 
 from Karma import db
 
@@ -20,6 +27,8 @@ class User(BaseModel):
     id = IntegerField(unique=True, primary_key=True)
     user_id = IntegerField(unique=True)
     is_sudo = BooleanField(default=False)
+    is_blacklisted = BooleanField(default=False)
+    reason_blacklist = TextField(null=True, default="")
 
 
 class MonthYear(BaseModel):

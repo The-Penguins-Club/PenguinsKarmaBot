@@ -6,6 +6,7 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from Karma import SUDOERS, Karma
+from Karma.utils.filters import is_sudo
 
 
 @Karma.on_message(filters.command("start"))
@@ -49,7 +50,7 @@ async def help_home(_, query):
     )
 
 
-@Karma.on_message(filters.command("restart") & filters.chat(SUDOERS) & filters.private)
+@Karma.on_message(filters.command("restart") & is_sudo & filters.private)
 async def restart(_, message):
     await message.delete()
     execvp(sys.executable, [sys.executable, "-m", "Karma"])

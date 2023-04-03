@@ -8,7 +8,7 @@ if path.exists("config.env"):
     load_dotenv("config.env")
 
 
-REQUIRED_KEYS = ["API_ID", "API_HASH", "BOT_TOKEN"]
+REQUIRED_KEYS = ["API_ID", "API_HASH", "BOT_TOKEN", "NETWORK"]
 for _key in REQUIRED_KEYS:
     if not environ.get(_key):
         print(f"{_key} is missing.")
@@ -18,9 +18,8 @@ for _key in REQUIRED_KEYS:
 db = SqliteDatabase("PenguinsKarma.db")
 
 
-SUDOERS = []
-for sudo in environ.get("SUDOERS").split():
-    SUDOERS.append(int(sudo))
+SUDOERS = [int(sudo) for sudo in environ.get("SUDOERS").split()]
+NETWORK = [int(group_id) for group_id in environ.get("NETWORK").split()]
 
 
 class Karma(Client):
