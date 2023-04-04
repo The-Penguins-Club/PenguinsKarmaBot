@@ -36,6 +36,7 @@ class Karma(Client):
             bot_token=environ["BOT_TOKEN"],
             plugins=dict(root=f"{name.capitalize()}.plugins"),
         )
+
     async def start(self):
         await super().start()
         me = await self.get_me()

@@ -5,11 +5,11 @@ from os import execvp, sys
 from pyrogram import enums, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from Karma import SUDOERS, Karma
+from Karma import Karma, PREFIXS
 from Karma.utils.filters import is_sudo
 
 
-@Karma.on_message(filters.command("start"))
+@Karma.on_message(filters.command("start", prefixes=PREFIXS))
 async def start(_, message):
     await message.reply_text("Bleh!")
 
@@ -19,12 +19,12 @@ helps = {
     "Restart": "Only Sudoers can Restart bot.\nUse **/restart** in private.",
     "Rules": "Send ++1 or --1 to give or take karma. (Do not abuse, You'll be blacklisted)",
     "Donation": "Use **/give 25(int)** in reply for donate karma.",
-    "Admin": "Use **/blacklist** if you want to blacklist someone and **/rmblacklist** if you want to remove someone from blacklist.",
+    "Admin": "Use **/blacklist** if you want to blacklist someone and **/rmblacklist** if you want to remove someone from blacklist.\nUse **addsudo** to add someone as Sudo or **rmsudo** to remove someone from Sudo.",
     "Stats": "Use **/stats** for Overall Stats.\nUse **/karmacount** if you want to get karma of specific someone.",
 }
 
 
-@Karma.on_message(filters.command("help"))
+@Karma.on_message(filters.command("help", prefixes=PREFIXS))
 async def help(_, message):
     if message.chat.type != enums.ChatType.PRIVATE:
         return await message.reply("Send help command in PM. -_-")
@@ -55,7 +55,9 @@ async def help_home(_, query):
     )
 
 
-@Karma.on_message(filters.command("restart") & is_sudo & filters.private)
+@Karma.on_message(
+    filters.command("restart", prefixes=PREFIXS) & is_sudo & filters.private
+)
 async def restart(_, message):
     await message.delete()
     execvp(sys.executable, [sys.executable, "-m", "Karma"])

@@ -1,7 +1,7 @@
 from re import findall
 
 from pyrogram import filters
-
+from pyrogram.types import Message
 from Karma import NETWORK, PREFIXS, SUDOERS, Karma
 from Karma.utils.dbhelpers import (
     User,
@@ -234,4 +234,40 @@ async def donate(_, message):
     recipientdb.save()
     return await message.reply(
         f"{donor.mention} donated {donation} ~~dollar~~karma to {recipient.mention}."
+    )
+
+
+@Karma.on_message(
+    filters.command("addsudo", prefixes=PREFIXS) & is_sudo & filters.reply
+)
+async def addsudo(_, message: Message):
+    future_admin = message.reply_to_message.from_user
+    if not future_admin:
+        return await message.reply("Anon user can't be sudo.")
+    admindb = get_user(future_admin.id)
+    if admindb.is_sudo:
+        return await message.reply(f"{future_admin.mention} is alreay a sudo user.")
+    admindb.is_sudo = True
+    admindb.save()
+    return await message.reply(
+        f"{future_admin.mention} has been promoted to a Sudo user by {message.from_user.id}."
+    )
+
+
+@Karma.on_message(
+    filters.command("rmsudo", prefixes=PREFIXS) & filters.user(SUDOERS) & filters.reply
+)
+async def remove_sudo(_, message: Message):
+    future_admin = message.reply_to_message.from_user
+    if not future_admin:
+        return await message.reply(
+            "Anon user can't be sudo. How tf I'm supposed to remove him/her from sudo?"
+        )
+    admindb = get_user(future_admin.id)
+    if not admindb.is_sudo:
+        return await message.reply(f"{future_admin.mention} is not a sudo user.")
+    admindb.is_sudo = False
+    admindb.save()
+    return await message.reply(
+        f"{future_admin.mention} has been demoted to a regular user by {message.from_user.id}."
     )
