@@ -83,8 +83,9 @@ async def karmaCount(_, message):
 
 
 @Karma.on_message(filters.command(["stats"], prefixes=PREFIXS) & filters.chat(NETWORK))
-async def stats(app, message):
+async def stats(app, message: Message):
     stats = {}
+    reply = await message.reply("Checking stats!")
     for user in User.select():
         stats[user.user_id] = sum_of_karma(user)
     # https://www.freecodecamp.org/news/sort-dictionary-by-value-in-python/
@@ -94,7 +95,7 @@ async def stats(app, message):
     for user in stats:
         try:
             user_t = await app.get_users(int(user))
-            message_text += f"{user_t.mention} = {stats.get(user)}\n"
+            message_text += f"{user_t.first_name}{' '+user_t.last_name if user_t.last_name else ''} = {stats.get(user)}\n"
             if _limit == _current:
                 break
             _current += 1
@@ -103,7 +104,7 @@ async def stats(app, message):
             user = get_user(user)
             user.delete_instance()
             print(f"Removed {user}.")
-    await message.reply(message_text)
+    await reply.edit_text(message_text)
 
 
 def neutral(x: int):
