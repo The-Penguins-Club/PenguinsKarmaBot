@@ -43,10 +43,10 @@ class Karma(BaseModel):
 
 
 def sum_of_karma(User):
-    sum = 0
+    _sum = 0
     for karma in User.karmas:
-        sum = sum + karma.karma
-    return sum
+        _sum = _sum + karma.karma
+    return _sum
 
 
 def get_user(userid):

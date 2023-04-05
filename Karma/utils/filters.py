@@ -28,9 +28,7 @@ async def is_whitelisted(_, __, message: Message):
             False
 
     user = get_user(message.from_user.id)
-    if user.is_blacklisted:
-        return False
-    return True
+    return not user.is_blacklisted
 
 
 is_whitelisted = filters.create(is_whitelisted)

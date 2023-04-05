@@ -33,10 +33,7 @@ async def Whole_Dmn_Thing(message, is_positive=True, is_admin=False):
         karma.karma = karma.karma - 1
         karma.save()
         return await message.reply("টুরা কোড! টুরা কোড!")
-    if is_positive:
-        karma.karma = karma.karma + karmanum
-    else:
-        karma.karma = karma.karma - karmanum
+    karma.karma = karma.karma + karmanum if is_positive else karma.karma - karmanum
     karma.save()
     if is_positive:
         return await message.reply(
@@ -84,10 +81,8 @@ async def karmaCount(_, message):
 
 @Karma.on_message(filters.command(["stats"], prefixes=PREFIXS) & filters.chat(NETWORK))
 async def stats(app, message: Message):
-    stats = {}
     reply = await message.reply("Checking stats!")
-    for user in User.select():
-        stats[user.user_id] = sum_of_karma(user)
+    stats = {user.user_id: sum_of_karma(user) for user in User.select()}
     # https://www.freecodecamp.org/news/sort-dictionary-by-value-in-python/
     stats = dict(sorted(stats.items(), key=lambda x: x[1], reverse=True))
     message_text = "Stats:\n\n"
@@ -95,7 +90,7 @@ async def stats(app, message: Message):
     for user in stats:
         try:
             user_t = await app.get_users(int(user))
-            message_text += f"{user_t.first_name}{' '+user_t.last_name if user_t.last_name else ''} = {stats.get(user)}\n"
+            message_text += f"{user_t.first_name}{f' {user_t.last_name}' if user_t.last_name else ''} = {stats.get(user)}\n"
             if _limit == _current:
                 break
             _current += 1
@@ -109,9 +104,7 @@ async def stats(app, message: Message):
 
 def neutral(x: int):
     try:
-        if x > 0:
-            return x
-        return x * (-1)
+        return x if x > 0 else x * (-1)
     except ValueError:
         return 0
 
@@ -122,7 +115,7 @@ def neutral(x: int):
     & filters.chat(NETWORK)
 )
 async def karma(app, message):
-    if not len(message.command) > 2:
+    if len(message.command) <= 2:
         return
     try:
         userid = await app.get_users(message.command[1])
@@ -161,7 +154,7 @@ async def karma(app, message):
 )
 async def Reward(_, message):
     to_user = message.reply_to_message.from_user
-    if not len(message.command) > 1:
+    if len(message.command) <= 1:
         return await message.reply("I need Two Arguments! See help section.")
     if not to_user:
         return await message.reply("I can't reward an anon user.")
