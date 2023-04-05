@@ -250,7 +250,7 @@ async def addsudo(_, message: Message):
     admindb.is_sudo = True
     admindb.save()
     return await message.reply(
-        f"{future_admin.mention} has been promoted to a Sudo user by {message.from_user.id}."
+        f"{future_admin.mention} has been promoted to a Sudo user by {message.from_user.mention}."
     )
 
 
@@ -269,5 +269,5 @@ async def remove_sudo(_, message: Message):
     admindb.is_sudo = False
     admindb.save()
     return await message.reply(
-        f"{future_admin.mention} has been demoted to a regular user by {message.from_user.id}."
+        f"{future_admin.mention} has been demoted to a regular user by {message.from_user.mention}."
     )
