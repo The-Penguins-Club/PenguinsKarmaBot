@@ -1,20 +1,17 @@
-[tool.poetry]
+[project]
 name = "karmabot"
 version = "0.1.0"
+requires-python = ">=3.10"
 description = "A karma bot for Penguins Network."
-authors = ["rozari0 <rozario@duck.com>"]
 license = "GPL3"
 readme = "README.md"
 
-[tool.poetry.dependencies]
-python = "^3.10"
-Pyrogram = "^2.0.102"
-TgCrypto = "^1.2.5"
-python-dotenv = "^1.0.0"
-peewee = "^3.16.0"
-psycopg2-binary = "^2.9.5"
+dependencies = [
+    "peewee==3.16.0",
+    "pyrogram==2.0.102",
+    "pysocks==1.7.1",
+    "python-dotenv==1.0.0",
+    "python-telegram-bot>=22.5",
+    "tgcrypto==1.2.5",
+]
 
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
