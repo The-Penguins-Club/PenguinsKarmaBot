@@ -12,7 +12,7 @@ from Karma.utils.dbhelpers import (
 )
 from Karma.utils.filters import is_sudo, is_whitelisted
 
-karma_re = f"^(?:\+\+|\+|\-\-|\-)?(\d+)"
+karma_re = r"^(?:\+\+|\+|\-\-|\-)?(\d+)"
 
 
 async def Whole_Dmn_Thing(message, is_positive=True, is_admin=False):
