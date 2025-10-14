@@ -1,5 +1,7 @@
-peewee==3.16.0 
-pyrogram==2.0.102 
-pysocks==1.7.1 
-python-dotenv==1.0.0 
-tgcrypto==1.2.5 
+hydrogram>=0.2.0
+peewee==3.16.0
+pysocks==1.7.1
+python-dotenv==1.0.0
+python-environ>=0.4.54
+python-telegram-bot[ext]>=22.5
+uvloop>=0.21.0

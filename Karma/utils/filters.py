@@ -1,5 +1,5 @@
-from pyrogram import filters
-from pyrogram.types import Message
+from hydrogram import filters
+from hydrogram.types import Message
 
 from Karma import SUDOERS
 from Karma.utils.dbhelpers import get_user

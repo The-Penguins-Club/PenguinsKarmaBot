@@ -1,7 +1,8 @@
 from re import findall
 
-from pyrogram import filters
-from pyrogram.types import Message
+from hydrogram import filters
+from hydrogram.types import Message
+
 from Karma import NETWORK, PREFIXS, SUDOERS, Karma
 from Karma.utils.dbhelpers import (
     User,

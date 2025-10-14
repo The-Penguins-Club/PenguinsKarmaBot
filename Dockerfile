@@ -7,4 +7,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "-m", "Karma" ]
+CMD [ "python", "-m", "Karma", "&", "python", "-m", "bot" ]
+
+RUN chmod +x /app/start.sh
+
+CMD ["/app/start.sh"]
