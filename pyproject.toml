@@ -12,5 +12,6 @@ dependencies = [
     "python-decouple>=3.8",
     "python-dotenv==1.0.0",
     "python-telegram-bot[ext]>=22.5",
+    "uvloop>=0.21.0",
 ]
 

@@ -2,9 +2,9 @@ import logging
 from typing import List
 
 from telegram import Update
-from telegram.ext import Application, CommandHandler, filters
+from telegram.ext import Application, CommandHandler, filters, CallbackQueryHandler
 
-from bot.plugins.misc import backup, help_command, start
+from bot.plugins.misc import backup, help_command, start, helpbtn, help_home, restart
 from Karma.utils.dbhelpers import User
 
 from decouple import config
@@ -33,9 +33,16 @@ def main() -> None:
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(
         CommandHandler(
+            "restart", restart, filters=filters.Chat(SUDOERS) & filters.ChatType.PRIVATE
+        )
+    )
+    application.add_handler(
+        CommandHandler(
             "backup", backup, filters=filters.Chat(SUDOERS) & filters.ChatType.PRIVATE
         )
     )
+    application.add_handler(CallbackQueryHandler(helpbtn, pattern=r"help_(.*?)"))
+    application.add_handler(CallbackQueryHandler(help_home, pattern=r"helphome"))
 
     # on non command i.e message - echo the message on Telegram
     # application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
