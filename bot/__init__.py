@@ -1,12 +1,13 @@
 import logging
-from typing import List, Optional
+from typing import List
 
-import environ
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters
+from telegram.ext import Application, CommandHandler, filters
 
-from bot.plugins.misc import backup,  help_command, start
+from bot.plugins.misc import backup, help_command, start
 from Karma.utils.dbhelpers import User
+
+from decouple import config
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -14,18 +15,18 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
-env = environ.Env()
-environ.Env.read_env("config.env")
-SUDOERS: List[int] = list(map(int, env("SUDOERS").split()))
+BOT_TOKEN = config("BOT_TOKEN")
+SUDOERS: List[int] = config("SUDOERS", cast=lambda x: [int(i) for i in x.split()])
 
 for user in User.select().where(User.is_sudo):
     if user.user_id not in SUDOERS:
         SUDOERS.append(user.user_id)
 
+
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token(env("BOT_TOKEN")).build()
+    application = Application.builder().token(BOT_TOKEN).build()
 
     # on different commands - answer in Telegram
     application.add_handler(CommandHandler("start", start))

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from telegram import ForceReply, InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 helps = {
@@ -11,6 +11,9 @@ helps = {
     "Admin": "Use **/blacklist** if you want to blacklist someone and **/rmblacklist** if you want to remove someone from blacklist.\nUse **addsudo** to add someone as Sudo or **rmsudo** to remove someone from Sudo.",
     "Stats": "Use **/stats** for Overall Stats.\nUse **/karmacount** if you want to get karma of specific someone.\nUse **/backup** in private to get DB backup.",
 }
+
+# sort helps by key
+helps = dict(sorted(helps.items()))
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -32,8 +35,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     """Send a message when the command /help is issued."""
     user = update.effective_user
     keyboard = [
-        [InlineKeyboardButton(text=i, callback_data=f"help_{i}")] for i in helps
+        InlineKeyboardButton(text=i, callback_data=f"help_{i}") for i in helps
     ]
+    keyboard = [keyboard[i:i + 3] for i in range(0, len(keyboard), 3)]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_markdown(
         f"Hello **{user.mention_markdown()}**, I'm **Penguins Karma Bot**.",
