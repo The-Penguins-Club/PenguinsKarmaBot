@@ -16,7 +16,7 @@ from Karma.utils.filters import is_sudo, is_whitelisted
 karma_re = r"^(?:\+\+|\+|\-\-|\-)?(\d+)"
 
 
-async def Whole_Dmn_Thing(message, is_positive=True, is_admin=False):
+async def updateKarma(message, is_positive=True, is_admin=False):
     from_user, to_user = message.from_user, message.reply_to_message.from_user
 
     user = get_user(to_user.id)
@@ -55,12 +55,12 @@ async def Whole_Dmn_Thing(message, is_positive=True, is_admin=False):
 async def KarmaFirm(_, message):
     if message.text.startswith("+"):
         if get_user(message.from_user.id).is_sudo or message.from_user.id in SUDOERS:
-            return await Whole_Dmn_Thing(message, True, True)
-        return await Whole_Dmn_Thing(message)
+            return await updateKarma(message, True, True)
+        return await updateKarma(message)
     elif message.text.startswith("-"):
         if get_user(message.from_user.id).is_sudo or message.from_user.id in SUDOERS:
-            return await Whole_Dmn_Thing(message, False, True)
-        return await Whole_Dmn_Thing(message, False)
+            return await updateKarma(message, False, True)
+        return await updateKarma(message, False)
 
 
 @Karma.on_message(
@@ -108,43 +108,6 @@ def neutral(x: int):
         return x if x > 0 else x * (-1)
     except ValueError:
         return 0
-
-
-@Karma.on_message(
-    filters.command(["karma"], prefixes=PREFIXS)
-    & is_whitelisted
-    & filters.chat(NETWORK)
-)
-async def karma(app, message):
-    if len(message.command) <= 2:
-        return
-    try:
-        userid = await app.get_users(message.command[1])
-        userid = userid.id
-    except Exception:
-        return await message.reply("User not Found.")
-
-    user = get_user(userid)
-    month = get_current_MY()
-    karma = get_karma_db(user, month)
-    karmanum = message.command[2]
-    try:
-        karmanum = int(float(karmanum))
-    except ValueError:
-        karmanum = 1
-
-    if neutral(karmanum) > 20 or neutral(karmanum) < 1:
-        return await message.reply("Minimum Karma is 1, Max is 20. :3")
-
-    karma.karma = karma.karma + karmanum
-    karma.save()
-    if karmanum > 0:
-        return await message.reply(
-            f"Karma incremented by: {karmanum}.\nCurrent Karma Count is: {sum_of_karma(user)}"
-        )
-    await message.reply(
-        f"Karma decremented by: {karmanum}.\nCurrent Karma Count is: {sum_of_karma(user)}"
-    )
 
 
 @Karma.on_message(
@@ -229,40 +192,4 @@ async def donate(_, message):
     recipientdb.save()
     return await message.reply(
         f"{donor.mention} donated {donation} ~~dollar~~karma to {recipient.mention}."
-    )
-
-
-@Karma.on_message(
-    filters.command("addsudo", prefixes=PREFIXS) & is_sudo & filters.reply
-)
-async def addsudo(_, message: Message):
-    future_admin = message.reply_to_message.from_user
-    if not future_admin:
-        return await message.reply("Anon user can't be sudo.")
-    admindb = get_user(future_admin.id)
-    if admindb.is_sudo:
-        return await message.reply(f"{future_admin.mention} is alreay a sudo user.")
-    admindb.is_sudo = True
-    admindb.save()
-    return await message.reply(
-        f"{future_admin.mention} has been promoted to a Sudo user by {message.from_user.mention}."
-    )
-
-
-@Karma.on_message(
-    filters.command("rmsudo", prefixes=PREFIXS) & filters.user(SUDOERS) & filters.reply
-)
-async def remove_sudo(_, message: Message):
-    future_admin = message.reply_to_message.from_user
-    if not future_admin:
-        return await message.reply(
-            "Anon user can't be sudo. How tf I'm supposed to remove him/her from sudo?"
-        )
-    admindb = get_user(future_admin.id)
-    if not admindb.is_sudo:
-        return await message.reply(f"{future_admin.mention} is not a sudo user.")
-    admindb.is_sudo = False
-    admindb.save()
-    return await message.reply(
-        f"{future_admin.mention} has been demoted to a regular user by {message.from_user.mention}."
     )

@@ -1,6 +1,6 @@
+import sys
 from datetime import datetime
 from os import execvp
-import sys
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
@@ -60,6 +60,7 @@ async def helpbtn(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = f"Help for **{i}**\n\n{helps[i]}"
     await query.message.edit_text(text=text, reply_markup=button, parse_mode="Markdown")
 
+
 async def help_home(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
@@ -69,6 +70,7 @@ async def help_home(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         reply_markup=reply_markup,
         parse_mode="Markdown",
     )
+
 
 async def restart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Restart the bot."""
