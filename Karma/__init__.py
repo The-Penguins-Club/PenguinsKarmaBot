@@ -1,8 +1,8 @@
 from os import environ, path, sys
 
 from dotenv import load_dotenv
+from hydrogram import Client
 from peewee import SqliteDatabase
-from pyrogram import Client
 
 if path.exists("config.env"):
     load_dotenv("config.env")
