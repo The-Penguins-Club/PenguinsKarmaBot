@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from Karma.utils.dbhelpers import get_user
+from bot.models import User
 
 
 async def addsudo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -11,7 +11,7 @@ async def addsudo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.message.reply_to_message.from_user
     if not user:
         return await update.message.reply_text("Can't add an anonymous user as sudo.")
-    _user = get_user(user.id)
+    _user, _ = User.get_or_create(id=user.id)
     _user.is_sudo = True
     _user.save()
     await update.message.reply_text(
@@ -30,7 +30,7 @@ async def remove_sudo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         return await update.message.reply_text(
             "Can't remove an anonymous user from sudo."
         )
-    _user = get_user(user.id)
+    _user, _ = User.get_or_create(id=user.id)
     if not _user.is_sudo:
         return await update.message.reply_text(
             f"{user.mention_markdown()} is not a sudo user.", parse_mode="Markdown"

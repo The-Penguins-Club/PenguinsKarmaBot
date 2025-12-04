@@ -3,11 +3,21 @@ from typing import List
 
 from decouple import config
 from telegram import Update
-from telegram.ext import Application, CallbackQueryHandler, CommandHandler, filters
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    MessageHandler,
+    filters,
+)
 
+from bot.database import db
+from bot.models import User
+from bot.plugins.karma import decrement_karma, increment_karma, karma_stats
 from bot.plugins.misc import backup, help_command, help_home, helpbtn, restart, start
 from bot.plugins.sudoers import addsudo, remove_sudo
-from Karma.utils.dbhelpers import User
+
+__all__ = ["db", "main"]
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -71,6 +81,27 @@ def main() -> None:
             & filters.ChatType.GROUPS
             & filters.REPLY
             & filters.User(get_sudoers(), allow_empty=True),
+        )
+    )
+
+    application.add_handler(
+        MessageHandler(
+            filters.REPLY & filters.Regex(r"^(?:\+1|\+)(?:\s|$)") & ~filters.COMMAND,
+            increment_karma,
+        )
+    )
+
+    application.add_handler(
+        MessageHandler(
+            filters.REPLY & filters.Regex(r"^(?:-1|-)(?:\s|$)") & ~filters.COMMAND,
+            decrement_karma,
+        )
+    )
+    application.add_handler(
+        CommandHandler(
+            "stats",
+            karma_stats,
+            filters=filters.Chat(NETWORK) & filters.ChatType.GROUPS,
         )
     )
 
