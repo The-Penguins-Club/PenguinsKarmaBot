@@ -27,7 +27,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 BOT_TOKEN = config("BOT_TOKEN")
 SUDOERS: List[int] = config("SUDOERS", cast=lambda x: [int(i) for i in x.split()])
-NETWORK = config("NETWORK", cast=int)
+NETWORK = config("NETWORK", cast=lambda x: [int(i) for i in x.split()])
 
 
 print(f"Sudoers: {SUDOERS}")
