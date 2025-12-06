@@ -18,6 +18,7 @@ from bot.plugins.karma import (
     increment_karma,
     karma_stats,
     reward_karma,
+    give_karma,
 )
 from bot.plugins.misc import backup, help_command, help_home, helpbtn, restart, start
 from bot.plugins.sudoers import addsudo, remove_sudo
@@ -126,6 +127,14 @@ def main() -> None:
             & filters.ChatType.GROUPS
             & filters.REPLY
             & filters.User(get_sudoers(), allow_empty=True),
+        )
+    )
+
+    application.add_handler(
+        CommandHandler(
+            ["give", "donate"],
+            give_karma,
+            filters=filters.Chat(NETWORK) & filters.ChatType.GROUPS & filters.REPLY,
         )
     )
 
