@@ -42,8 +42,8 @@ print(f"Network: {NETWORK}, {type(NETWORK)}")
 
 def get_sudoers() -> List[int]:
     for user in User.select().where(User.is_sudo):
-        if user.user_id not in SUDOERS:
-            SUDOERS.append(user.user_id)
+        if user.id not in SUDOERS:
+            SUDOERS.append(user.id)
     return SUDOERS
 
 
