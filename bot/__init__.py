@@ -13,7 +13,12 @@ from telegram.ext import (
 
 from bot.database import db
 from bot.models import User
-from bot.plugins.karma import decrement_karma, increment_karma, karma_stats
+from bot.plugins.karma import (
+    decrement_karma,
+    increment_karma,
+    karma_stats,
+    reward_karma,
+)
 from bot.plugins.misc import backup, help_command, help_home, helpbtn, restart, start
 from bot.plugins.sudoers import addsudo, remove_sudo
 
@@ -86,14 +91,22 @@ def main() -> None:
 
     application.add_handler(
         MessageHandler(
-            filters.REPLY & filters.Regex(r"^(?:\+1|\+)(?:\s|$)") & ~filters.COMMAND,
+            filters.REPLY
+            & filters.Regex(r"^(?:\+1|\+)(?:\s|$)")
+            & ~filters.COMMAND
+            & filters.Chat(NETWORK)
+            & filters.ChatType.GROUPS,
             increment_karma,
         )
     )
 
     application.add_handler(
         MessageHandler(
-            filters.REPLY & filters.Regex(r"^(?:-1|-)(?:\s|$)") & ~filters.COMMAND,
+            filters.REPLY
+            & filters.Regex(r"^(?:-1|-)(?:\s|$)")
+            & ~filters.COMMAND
+            & filters.Chat(NETWORK)
+            & filters.ChatType.GROUPS,
             decrement_karma,
         )
     )
@@ -105,8 +118,15 @@ def main() -> None:
         )
     )
 
-    # on non command i.e message - echo the message on Telegram
-    # application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    application.add_handler(
+        CommandHandler(
+            "reward",
+            reward_karma,
+            filters=filters.Chat(NETWORK)
+            & filters.ChatType.GROUPS
+            & filters.REPLY
+            & filters.User(get_sudoers(), allow_empty=True),
+        )
+    )
 
-    # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
