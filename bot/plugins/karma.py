@@ -66,12 +66,15 @@ async def karma_stats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     bot = context.bot
 
     for user in users:
-        chat = await bot.get_chat(user.id)
-        name = chat.first_name
-        if chat.last_name:
-            name += f" {chat.last_name}"
+        try:
+            chat = await bot.get_chat(user.id)
+            name = chat.first_name
+            if chat.last_name:
+                name += f" {chat.last_name}"
 
-        message_text += f"{name}: {user.karma}\n"
+            message_text += f"{name}: {user.karma}\n"
+        except Exception:
+            continue
 
     await reply.edit_text(message_text)
 
