@@ -11,14 +11,15 @@ from telegram.ext import (
     filters,
 )
 
+from bot.custom_filters import REPLY
 from bot.database import db
 from bot.models import User
 from bot.plugins.karma import (
     decrement_karma,
+    give_karma,
     increment_karma,
     karma_stats,
     reward_karma,
-    give_karma,
 )
 from bot.plugins.misc import backup, help_command, help_home, helpbtn, restart, start
 from bot.plugins.sudoers import addsudo, remove_sudo
@@ -75,7 +76,7 @@ def main() -> None:
             addsudo,
             filters=filters.Chat(NETWORK)
             & filters.ChatType.GROUPS
-            & filters.REPLY
+            & REPLY
             & filters.User(get_sudoers(), allow_empty=True),
         )
     )
@@ -85,14 +86,14 @@ def main() -> None:
             remove_sudo,
             filters=filters.Chat(NETWORK)
             & filters.ChatType.GROUPS
-            & filters.REPLY
+            & REPLY
             & filters.User(get_sudoers(), allow_empty=True),
         )
     )
 
     application.add_handler(
         MessageHandler(
-            filters.REPLY
+            REPLY
             & filters.Regex(r"^(?:\+1|\+)(?:\s|$)")
             & ~filters.COMMAND
             & filters.Chat(NETWORK)
@@ -103,7 +104,7 @@ def main() -> None:
 
     application.add_handler(
         MessageHandler(
-            filters.REPLY
+            REPLY
             & filters.Regex(r"^(?:-1|-)(?:\s|$)")
             & ~filters.COMMAND
             & filters.Chat(NETWORK)
@@ -125,7 +126,7 @@ def main() -> None:
             reward_karma,
             filters=filters.Chat(NETWORK)
             & filters.ChatType.GROUPS
-            & filters.REPLY
+            & REPLY
             & filters.User(get_sudoers(), allow_empty=True),
         )
     )
@@ -134,7 +135,7 @@ def main() -> None:
         CommandHandler(
             ["give", "donate"],
             give_karma,
-            filters=filters.Chat(NETWORK) & filters.ChatType.GROUPS & filters.REPLY,
+            filters=filters.Chat(NETWORK) & filters.ChatType.GROUPS & REPLY,
         )
     )
 

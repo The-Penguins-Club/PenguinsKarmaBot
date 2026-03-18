@@ -1,8 +1,8 @@
+from httpx import get
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from bot.models import Karma, User
-from httpx import get
 
 
 async def increment_karma(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

@@ -9,6 +9,6 @@ readme = "README.md"
 dependencies = [
     "peewee==3.16.0",
     "python-decouple>=3.8",
-    "python-telegram-bot[ext]>=22.5",
+    "python-telegram-bot>=22.7",
 ]
 
